@@ -1,32 +1,34 @@
 #!/bin/bash
+# --- Validation Script for WordPress Stack ---
 
 KEY_PATH=$1
 EC2_IP=$2
 
 if [ -z "$KEY_PATH" ] || [ -z "$EC2_IP" ]; then
-  echo "Usage: ./validate.sh <key_path> <ec2_ip>"
-  exit 1
+    echo "Usage: ./validate.sh <key_path> <ec2_ip>"
+    exit 1
 fi
 
-echo "Validating deployment..."
+echo "🔍 Validating deployment at $EC2_IP..."
 
-# Check containers
-ssh -i "$KEY_PATH" ubuntu@"$EC2_IP" << 'EOF'
-  echo "---- Docker Containers ----"
-  docker ps
+# Check Docker containers status via SSH
+ssh -o StrictHostKeyChecking=no -i "$KEY_PATH" ubuntu@"$EC2_IP" << 'EOF'
+    echo "--- Active Docker Containers ---"
+    sudo docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"
 
-  echo "---- Checking Nginx ----"
-  docker ps | grep nginx || echo "Nginx not running"
-
-  echo "---- Checking WordPress ----"
-  docker ps | grep wordpress || echo "WordPress not running"
+    echo "--- Health Checks ---"
+    sudo docker ps | grep nginx && echo "✔ Nginx is running" || echo "✘ Nginx is DOWN"
+    sudo docker ps | grep wordpress && echo "✔ WordPress is running" || echo "✘ WordPress is DOWN"
+    sudo docker ps | grep db && echo "✔ Database is running" || echo "✘ Database is DOWN"
 EOF
 
-# Check HTTP
+# Perform a local HTTP health check
+echo "--- Web Service Check ---"
 STATUS=$(curl -o /dev/null -s -w "%{http_code}" "http://$EC2_IP")
 
-if [ "$STATUS" == "200" ] || [ "$STATUS" == "302" ]; then
-  echo "Website is up (HTTP $STATUS)"
+if [[ "$STATUS" == "200" || "$STATUS" == "302" ]]; then
+    echo "⭐ SUCCESS: Website is accessible (HTTP $STATUS)"
 else
-  echo "Website failed (HTTP $STATUS)"
+    echo "🚨 FAILURE: Website returned HTTP $STATUS"
+    exit 1
 fi
