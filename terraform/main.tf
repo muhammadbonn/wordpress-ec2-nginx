@@ -10,7 +10,7 @@ terraform {
   backend "s3" {
     bucket = "muhammad-bonn-terraform-state" # Make sure to create this bucket in AWS manually first
     key    = "prod/wordpress.tfstate"
-    region = "us-east-1"
+    region = "eu-central-1"
   }
 }
 
