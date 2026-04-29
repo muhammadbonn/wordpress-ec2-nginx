@@ -1,0 +1,61 @@
+name: "CI/CD WordPress Stack"
+
+on:
+  push:
+    branches:
+      - main  # Trigger on every push to the main branch
+
+jobs:
+  # --- STAGE 1: Infrastructure Management ---
+  terraform:
+    name: "Infrastructure (Terraform)"
+    runs-on: ubuntu-latest
+    env:
+      # Injecting the public key into Terraform variables
+      TF_VAR_public_key: ${{ secrets.MY_PUBLIC_KEY }}
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      - name: Terraform Init & Apply
+        run: |
+          terraform init
+          terraform apply -auto-approve
+        working-directory: ./terraform
+
+  # --- STAGE 2: Deployment & Service Validation ---
+  deploy:
+    name: "Deploy & Validate"
+    needs: terraform # Runs only after successful infrastructure setup
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup SSH Key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.EC2_SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+
+      - name: Run Deployment Script
+        # Using your deploy.sh script to move files and start containers
+        run: |
+          chmod +x ./scripts/deploy.sh
+          ./scripts/deploy.sh ~/.ssh/id_rsa ${{ secrets.EC2_HOST }}
+
+      - name: Run Validation Script
+        # Using your validate.sh script to ensure everything is UP
+        run: |
+          chmod +x ./scripts/validate.sh
+          ./scripts/validate.sh ~/.ssh/id_rsa ${{ secrets.EC2_HOST }}
