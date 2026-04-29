@@ -2,7 +2,7 @@
 variable "aws_region" {
   description = "AWS region"
   type        = string
-  default     = "us-east-1"
+  default     = "eu-central-1"
 }
 
 # EC2 Instance size
@@ -16,7 +16,7 @@ variable "instance_type" {
 variable "ami_id" {
   description = "Ubuntu 22.04 LTS AMI ID"
   type        = string
-  default     = "ami-0c7217cdde317cfec" 
+  default     = "ami-051eaec1417c5d4ae" 
 }
 
 # Name of the key pair in AWS Console
