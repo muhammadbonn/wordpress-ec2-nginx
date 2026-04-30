@@ -1,3 +1,20 @@
+<div align="center">
+
+# 🚀 Automated CI/CD WordPress Stack on AWS EC2
+
+![AWS](https://img.shields.io/badge/AWS-%23FF9900.svg?style=for-the-badge&logo=amazon-aws&logoColor=white)
+![Terraform](https://img.shields.io/badge/terraform-%235835CC.svg?style=for-the-badge&logo=terraform&logoColor=white)
+![GitHub Actions](https://img.shields.io/badge/github%20actions-%232671E5.svg?style=for-the-badge&logo=githubactions&logoColor=white)
+![Docker](https://img.shields.io/badge/docker-%230db7ed.svg?style=for-the-badge&logo=docker&logoColor=white)
+![Ubuntu](https://img.shields.io/badge/Ubuntu-E95420?style=for-the-badge&logo=ubuntu&logoColor=white)
+![Nginx](https://img.shields.io/badge/nginx-%23009639.svg?style=for-the-badge&logo=nginx&logoColor=white)
+![WordPress](https://img.shields.io/badge/WordPress-%23117AC9.svg?style=for-the-badge&logo=WordPress&logoColor=white)
+![MySQL](https://img.shields.io/badge/mysql-%2300000f.svg?style=for-the-badge&logo=mysql&logoColor=white)
+![Bash Script](https://img.shields.io/badge/bash_script-%23121011.svg?style=for-the-badge&logo=gnu-bash&logoColor=white)
+
+<br>
+</div>
+
 # Automated CI/CD WordPress Stack on AWS EC2
 
 Welcome to the Automated WordPress Stack project! This repository contains a complete, end-to-end CI/CD pipeline that provisions infrastructure on AWS using Terraform and deploys a fully functional WordPress website (with Nginx and MySQL) using Docker and GitHub Actions.
@@ -8,6 +25,48 @@ Welcome to the Automated WordPress Stack project! This repository contains a com
 * **CI/CD Pipeline:** GitHub Actions
 * **Containerization:** Docker & Docker Compose
 * **Web Stack:** **LEMP Stack** (WordPress, MariaDB/MySQL, Nginx (Reverse Proxy))
+
+
+graph TD
+    %% Define Node Colors
+    classDef aws fill:#FF9900,stroke:#232F3E,stroke-width:2px,color:black;
+    classDef github fill:#181717,stroke:#ffffff,stroke-width:2px,color:white;
+    classDef docker fill:#2496ED,stroke:#0db7ed,stroke-width:2px,color:white;
+    classDef user fill:#4CAF50,stroke:#388E3C,stroke-width:2px,color:white;
+
+    %% Nodes and Architecture
+    Dev((👨‍💻 Developer)):::user
+    
+    subgraph GitHub_Platform [GitHub]
+        Repo[🐙 GitHub Repository]:::github
+        Actions[⚙️ GitHub Actions CI/CD]:::github
+        Secrets[(🔑 GitHub Secrets)]:::github
+    end
+
+    subgraph AWS_Cloud [AWS Cloud - eu-central-1]
+        EC2[🖥️ EC2 Instance Ubuntu]:::aws
+        
+        subgraph Docker_Host [Docker Environment]
+            Nginx[🌐 Nginx Reverse Proxy]:::docker
+            WP[📝 WordPress App]:::docker
+            DB[(🗄️ MariaDB Database)]:::docker
+        end
+    end
+
+    Client((🌍 End User)):::user
+
+    %% Connections
+    Dev -- "1. Push Code" --> Repo
+    Repo -- "2. Trigger Workflow" --> Actions
+    Actions -. "Reads Credentials" .-> Secrets
+    Actions -- "3. Terraform Provision" --> EC2
+    Actions -- "4. SSH & Deploy Script" --> EC2
+    
+    EC2 --> Nginx
+    Nginx -- "Routes PHP requests" --> WP
+    WP -- "Reads/Writes Data" --> DB
+
+    Client -- "HTTP (Port 80)" --> Nginx
 
 ---
 
