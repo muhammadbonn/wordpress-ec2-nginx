@@ -22,6 +22,10 @@ ssh -o StrictHostKeyChecking=no -i "$KEY_PATH" ubuntu@"$EC2_IP" << 'EOF'
     sudo docker ps | grep db && echo "✔ Database is running" || echo "✘ Database is DOWN"
 EOF
 
+# Give WordPress time to initialize and establish DB connection
+echo "⏳ Waiting 15 seconds for WordPress to fully initialize..."
+sleep 15
+
 # Perform a local HTTP health check
 echo "--- Web Service Check ---"
 STATUS=$(curl -o /dev/null -s -w "%{http_code}" "http://$EC2_IP")
