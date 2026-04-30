@@ -1,6 +1,6 @@
 <div align="center">
 
-# 🚀 Automated CI/CD WordPress Stack on AWS EC2
+# Automated CI/CD WordPress Stack on AWS EC2
 
 ![AWS](https://img.shields.io/badge/AWS-%23FF9900.svg?style=for-the-badge&logo=amazon-aws&logoColor=white)
 ![Terraform](https://img.shields.io/badge/terraform-%235835CC.svg?style=for-the-badge&logo=terraform&logoColor=white)
@@ -26,7 +26,7 @@ Welcome to the Automated WordPress Stack project! This repository contains a com
 * **Containerization:** Docker & Docker Compose
 * **Web Stack:** **LEMP Stack** (WordPress, MariaDB/MySQL, Nginx (Reverse Proxy))
 
-
+```mermaid
 graph TD
     %% Define Node Colors
     classDef aws fill:#FF9900,stroke:#232F3E,stroke-width:2px,color:black;
@@ -67,6 +67,8 @@ graph TD
     WP -- "Reads/Writes Data" --> DB
 
     Client -- "HTTP (Port 80)" --> Nginx
+```
+
 
 ---
 
