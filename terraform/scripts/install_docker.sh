@@ -8,9 +8,9 @@ sudo apt-get update -y
 # 2. Install prerequisite packages for HTTPS repositories
 sudo apt-get install -y ca-certificates curl gnupg
 
-# 3. Add Docker’s official GPG key for package verification
+# 3. Add Docker’s official GPG key for package verification (Added --yes to overwrite if exists)
 sudo install -m 0755 -d /etc/apt/keyrings
-curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --yes --dearmor -o /etc/apt/keyrings/docker.gpg
 sudo chmod a+r /etc/apt/keyrings/docker.gpg
 
 # 4. Set up the Docker repository
@@ -26,9 +26,17 @@ sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plug
 # 6. Enable Docker to run without sudo by adding the current user to the docker group
 sudo usermod -aG docker $USER
 
-# 7. Apply group changes without logout (Critical for automation scripts)
+# 7. Apply group changes without logout and run deployment commands
 newgrp docker <<EONG
-# 8. Verify installation
+# Verify installation
 docker --version
 docker compose version
+
+# --- THE FIX: Clean up old containers and networks ---
+echo "Cleaning up old containers..."
+docker compose down || true
+
+# --- Deploy the new containers ---
+echo "Deploying new WordPress stack..."
+docker compose up -d
 EONG
